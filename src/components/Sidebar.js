@@ -1,37 +1,26 @@
 import React, { useState } from 'react';
-import {
-  Drawer,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Divider,
-  Toolbar,
-  IconButton,
-  Typography,
-  useMediaQuery,
-  Box,
-} from '@mui/material';
-import { HomeOutlined, PublicOutlined, BarChartOutlined, Menu, ChevronLeft } from '@mui/icons-material';
+import { Drawer, List, ListItem, ListItemText, ListItemIcon, Divider, Toolbar, IconButton, Typography, useMediaQuery, Box } from '@mui/material';
+import { PublicOutlined, BarChartOutlined, Menu, ChevronLeft } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom'; 
 
-const drawerWidth = 260; // Increased width for a spacious layout
+const drawerWidth = 260;
 
 const Sidebar = () => {
   const [open, setOpen] = useState(true);
   const isMobile = useMediaQuery('(max-width:600px)');
+  const navigate = useNavigate();
 
   const handleDrawerToggle = () => {
     setOpen(!open);
   };
 
-  // Custom Drawer Styles for Modern NASA Theme
   const StyledDrawer = styled(Drawer)(({ theme }) => ({
     '.MuiDrawer-paper': {
-      background: 'linear-gradient(145deg, #0d47a1, #002171)', // Spacey blue gradient
+      background: 'linear-gradient(145deg, #0d47a1, #002171)',
       color: '#ffffff',
       borderRight: '1px solid #3d5afe',
-      width: open ? drawerWidth : theme.spacing(8), // Adjust width based on state
+      width: open ? drawerWidth : theme.spacing(8),
       transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.enteringScreen,
@@ -46,7 +35,6 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Menu Button for Mobile View */}
       {isMobile && (
         <IconButton
           color="inherit"
@@ -58,13 +46,7 @@ const Sidebar = () => {
         </IconButton>
       )}
 
-      {/* NASA-themed Sidebar Drawer */}
-      <StyledDrawer
-        variant={isMobile ? 'temporary' : 'permanent'}
-        open={open}
-        onClose={handleDrawerToggle}
-      >
-        {/* Header Toolbar with Brand Name and Toggle Button */}
+      <StyledDrawer variant={isMobile ? 'temporary' : 'permanent'} open={open} onClose={handleDrawerToggle}>
         <Toolbar
           sx={{
             display: 'flex',
@@ -86,31 +68,29 @@ const Sidebar = () => {
         </Toolbar>
         <Divider />
 
-        {/* Sidebar Navigation with Custom Icons */}
         <List sx={{ paddingTop: 0 }}>
-          <ListItem button sx={menuItemStyle} onClick={() => alert('Navigate to Home')}>
-            <ListItemIcon sx={{ color: '#90caf9' }}>
-              <HomeOutlined />
-            </ListItemIcon>
-            <ListItemText primary="Home" sx={{ opacity: open ? 1 : 0 }} />
-          </ListItem>
-
-          <ListItem button sx={menuItemStyle} onClick={() => alert('Navigate to Map View')}>
+          <ListItem button sx={menuItemStyle} onClick={() => navigate('/map')}>
             <ListItemIcon sx={{ color: '#90caf9' }}>
               <PublicOutlined />
             </ListItemIcon>
             <ListItemText primary="Map View" sx={{ opacity: open ? 1 : 0 }} />
           </ListItem>
 
-          <ListItem button sx={menuItemStyle} onClick={() => alert('Navigate to Data Analysis')}>
+          <ListItem button sx={menuItemStyle} onClick={() => navigate('/data-analysis')}>
             <ListItemIcon sx={{ color: '#90caf9' }}>
               <BarChartOutlined />
             </ListItemIcon>
             <ListItemText primary="Data Analysis" sx={{ opacity: open ? 1 : 0 }} />
           </ListItem>
+
+          <ListItem button sx={menuItemStyle} onClick={() => navigate('/config')}>
+            <ListItemIcon sx={{ color: '#90caf9' }}>
+              <BarChartOutlined />
+            </ListItemIcon>
+            <ListItemText primary="Configuration" sx={{ opacity: open ? 1 : 0 }} />
+          </ListItem>
         </List>
 
-        {/* Optional Footer Section */}
         <Box sx={{ position: 'absolute', bottom: 20, width: '100%', textAlign: 'center' }}>
           <Typography variant="caption" sx={{ color: '#90caf9', opacity: open ? 1 : 0 }}>
             🚀 Explore the Cosmos!
@@ -124,7 +104,7 @@ const Sidebar = () => {
 const menuItemStyle = {
   padding: '10px 20px',
   '&:hover': {
-    backgroundColor: '#3949ab', // Hover color
+    backgroundColor: '#3949ab',
   },
   '& .MuiListItemText-root': {
     fontWeight: 500,

@@ -39,13 +39,13 @@ const LocationMarker = ({ position }) => {
 };
 
 const MapComponent = () => {
-  const [searchTerm, setSearchTerm] = useState("");
   const [markerPosition, setMarkerPosition] = useState(null);
   const [loading, setLoading] = useState(false);
   const [gridCorners, setGridCorners] = useState([]);
   const [countryPopup, setCountryPopup] = useState(null);
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [searchHistory, setSearchHistory] = useState([]);
 
   useEffect(() => {
     const fetchGeoJson = async () => {
@@ -58,7 +58,7 @@ const MapComponent = () => {
     fetchGeoJson();
   }, []);
 
-  const handleSearch = async (country, startDate, endDate) => {
+  const handleSearch = async (country) => {
     if (!country.trim()) {
       alert("Please enter a country");
       return;
@@ -90,14 +90,22 @@ const MapComponent = () => {
             ];
             const bottomLeft = [lat + (i + 1) * pixelSize, lon + j * pixelSize];
 
-            corners.push([topLeft, topRight, bottomRight, bottomLeft]);
+            corners.push({ topLeft, topRight, bottomRight, bottomLeft });
           }
         }
         setGridCorners(corners);
+
+        const searchLog = {
+          date: new Date().toISOString(), 
+          search: country,
+          coordinates: { lat, lon },
+          grid: corners,
+        };
+
+        setSearchHistory((prevLogs) => [...prevLogs, searchLog]);
       }
     } catch (error) {
       console.error("Error fetching the country:", error);
-      alert("There was an error searching for the country.");
     }
     setLoading(false);
   };
@@ -132,6 +140,16 @@ const MapComponent = () => {
         setCountryPopup(null);
       },
     });
+  };
+
+  const sendDataToBackend = async () => {
+    if (searchHistory.length === 0) return;
+
+    try {
+      console.log(searchHistory);
+    } catch (error) {
+      console.error("Error sending data to backend:", error);
+    }
   };
 
   return (
@@ -185,15 +203,10 @@ const MapComponent = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
         />
         <LocationMarker position={markerPosition} />
-        {markerPosition && (
-          <Marker position={markerPosition}>
-            <Popup>Target Pixel</Popup>
-          </Marker>
-        )}
         {gridCorners.map((cornerSet, index) => (
           <Rectangle
             key={index}
-            bounds={cornerSet}
+            bounds={[cornerSet.topLeft, cornerSet.bottomRight]}
             pathOptions={{ color: "blue", weight: 1, fillOpacity: 0.3 }}
           />
         ))}
