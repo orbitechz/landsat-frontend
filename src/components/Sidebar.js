@@ -82,13 +82,6 @@ const Sidebar = () => {
             </ListItemIcon>
             <ListItemText primary="Data Analysis" sx={{ opacity: open ? 1 : 0 }} />
           </ListItem>
-
-          <ListItem button sx={menuItemStyle} onClick={() => navigate('/config')}>
-            <ListItemIcon sx={{ color: '#90caf9' }}>
-              <BarChartOutlined />
-            </ListItemIcon>
-            <ListItemText primary="Configuration" sx={{ opacity: open ? 1 : 0 }} />
-          </ListItem>
         </List>
 
         <Box sx={{ position: 'absolute', bottom: 20, width: '100%', textAlign: 'center' }}>

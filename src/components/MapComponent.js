@@ -96,7 +96,7 @@ const MapComponent = () => {
         setGridCorners(corners);
 
         const searchLog = {
-          date: new Date().toISOString(), 
+          date: new Date().toISOString(),
           search: country,
           coordinates: { lat, lon },
           grid: corners,
@@ -132,6 +132,7 @@ const MapComponent = () => {
         setCountryPopup({
           name: layer.feature.properties.name,
           latlng: e.latlng,
+          bounds: layer.getBounds(),
         });
       },
       mouseout: (e) => {
@@ -218,12 +219,44 @@ const MapComponent = () => {
             position={countryPopup.latlng}
             closeButton={false}
             onClose={() => setCountryPopup(null)}
+            className="custom-popup"
           >
-            {countryPopup.name}
+            <div style={{ width: "300px", height: "250px" }}>
+              <MapSnippet bounds={countryPopup.bounds} />
+              <div style={{ marginTop: "10px" }}>
+                <h3>{countryPopup.name}</h3>
+                <p>Next landsat: 4 days</p>
+                <p>Last landsat: 12 days </p>
+              </div>
+            </div>
           </Popup>
         )}
       </MapContainer>
     </div>
+  );
+};
+
+const MapSnippet = ({ bounds }) => {
+  const center = bounds.getCenter();
+  return (
+    <MapContainer
+      center={center}
+      zoom={0}
+      noWrap={true}
+      style={{ height: "150px", width: "100%" }}
+    >
+      <TileLayer
+        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        noWrap={true}
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+      />
+      <Marker position={center}>
+        <Popup>
+          Center of {bounds.getNorthEast().lat.toFixed(2)},{" "}
+          {bounds.getNorthEast().lng.toFixed(2)}
+        </Popup>
+      </Marker>
+    </MapContainer>
   );
 };
 
