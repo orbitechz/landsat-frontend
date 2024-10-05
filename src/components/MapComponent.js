@@ -1,10 +1,19 @@
-import React, { useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap, Rectangle } from "react-leaflet";
+import React, { useState, useEffect } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  Rectangle,
+  GeoJSON,
+  useMap,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { TextField, Box, Button, CircularProgress } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import axios from "axios";
+import SearchDrawer from "./SearchDrawer";
 import "./style/map.css";
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -34,48 +43,95 @@ const MapComponent = () => {
   const [markerPosition, setMarkerPosition] = useState(null);
   const [loading, setLoading] = useState(false);
   const [gridCorners, setGridCorners] = useState([]);
+  const [countryPopup, setCountryPopup] = useState(null);
+  const [geoJsonData, setGeoJsonData] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) {
-      alert("Please enter a location");
+  useEffect(() => {
+    const fetchGeoJson = async () => {
+      const response = await fetch(
+        "https://raw.githubusercontent.com/datasets/geo-boundaries-world-110m/master/countries.geojson"
+      );
+      const data = await response.json();
+      setGeoJsonData(data);
+    };
+    fetchGeoJson();
+  }, []);
+
+  const handleSearch = async (country, startDate, endDate) => {
+    if (!country.trim()) {
+      alert("Please enter a country");
       return;
     }
 
     setLoading(true);
     try {
-      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${searchTerm}`;
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${country}`;
       const response = await axios.get(url);
 
       if (response.data.length === 0) {
-        alert("Location not found! Try another search.");
+        alert("Country not found! Try another search.");
       } else {
-        const location = response.data[0];
-        const lat = parseFloat(location.lat);
-        const lon = parseFloat(location.lon);
+        const loc = response.data[0];
+        const lat = parseFloat(loc.lat);
+        const lon = parseFloat(loc.lon);
         setMarkerPosition([lat, lon]);
 
         const pixelSize = 0.01;
         const corners = [];
-        
+
         for (let i = -1; i <= 1; i++) {
           for (let j = -1; j <= 1; j++) {
-            const topLeft = [lat + (i * pixelSize), lon + (j * pixelSize)];
-            const topRight = [lat + (i * pixelSize), lon + ((j + 1) * pixelSize)];
-            const bottomRight = [lat + ((i + 1) * pixelSize), lon + ((j + 1) * pixelSize)];
-            const bottomLeft = [lat + ((i + 1) * pixelSize), lon + (j * pixelSize)];
-            
+            const topLeft = [lat + i * pixelSize, lon + j * pixelSize];
+            const topRight = [lat + i * pixelSize, lon + (j + 1) * pixelSize];
+            const bottomRight = [
+              lat + (i + 1) * pixelSize,
+              lon + (j + 1) * pixelSize,
+            ];
+            const bottomLeft = [lat + (i + 1) * pixelSize, lon + j * pixelSize];
+
             corners.push([topLeft, topRight, bottomRight, bottomLeft]);
-            
-            console.log(`Grid ${i + 1},${j + 1} Corners:`, { topLeft, topRight, bottomRight, bottomLeft });
           }
         }
         setGridCorners(corners);
       }
     } catch (error) {
-      console.error("Error fetching the location:", error);
-      alert("There was an error searching for the location.");
+      console.error("Error fetching the country:", error);
+      alert("There was an error searching for the country.");
     }
     setLoading(false);
+  };
+
+  const countryStyle = {
+    color: "transparent",
+    weight: 1,
+    fillColor: "transparent",
+    fillOpacity: 0.3,
+  };
+
+  const hoverStyle = {
+    fillColor: "#74baff",
+    fillOpacity: 0.7,
+  };
+
+  const onEachCountry = (country, layer) => {
+    layer.setStyle(countryStyle);
+
+    layer.on({
+      mouseover: (e) => {
+        const layer = e.target;
+        layer.setStyle(hoverStyle);
+        setCountryPopup({
+          name: layer.feature.properties.name,
+          latlng: e.latlng,
+        });
+      },
+      mouseout: (e) => {
+        const layer = e.target;
+        layer.setStyle(countryStyle);
+        setCountryPopup(null);
+      },
+    });
   };
 
   return (
@@ -95,22 +151,10 @@ const MapComponent = () => {
           boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
         }}
       >
-        <TextField
-          label="Search Location"
-          variant="outlined"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          sx={{
-            backgroundColor: "#fff",
-            borderRadius: "8px",
-            boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
-          }}
-        />
         <Button
           variant="contained"
-          onClick={handleSearch}
+          onClick={() => setDrawerOpen(true)}
           sx={{
-            ml: 2,
             borderRadius: "8px",
             backgroundColor: "#1976d2",
             color: "#fff",
@@ -120,19 +164,20 @@ const MapComponent = () => {
             },
             boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
           }}
-          disabled={loading}
         >
-          {loading ? (
-            <CircularProgress size={24} color="inherit" />
-          ) : (
-            <SearchIcon />
-          )}
+          <SearchIcon />
         </Button>
       </Box>
 
+      <SearchDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onSearch={handleSearch}
+      />
+
       <MapContainer
         center={[51.505, -0.09]}
-        zoom={13}
+        zoom={2}
         style={{ height: "100vh", width: "100%" }}
       >
         <TileLayer
@@ -152,6 +197,18 @@ const MapComponent = () => {
             pathOptions={{ color: "blue", weight: 1, fillOpacity: 0.3 }}
           />
         ))}
+        {geoJsonData && (
+          <GeoJSON data={geoJsonData} onEachFeature={onEachCountry} />
+        )}
+        {countryPopup && (
+          <Popup
+            position={countryPopup.latlng}
+            closeButton={false}
+            onClose={() => setCountryPopup(null)}
+          >
+            {countryPopup.name}
+          </Popup>
+        )}
       </MapContainer>
     </div>
   );
