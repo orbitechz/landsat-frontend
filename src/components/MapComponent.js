@@ -7,6 +7,7 @@ import {
   Rectangle,
   GeoJSON,
   Polyline,
+  LayersControl,
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -32,6 +33,7 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
+
 // Location Marker Component
 const LocationMarker = ({ position }) => {
   const map = useMap();
@@ -45,6 +47,7 @@ const LocationMarker = ({ position }) => {
   ) : null;
 };
 
+const { BaseLayer } = LayersControl
 // Custom Zoom Control Component
 const CustomControls = () => {
   const map = useMap();
@@ -52,9 +55,9 @@ const CustomControls = () => {
   const zoomOut = () => map.zoomOut();
 
   return (
-    <div style={{ position: "absolute", bottom: "50px", right: "10px", zIndex: 1000, display: "flex", alignItems: "center", gap: '5px'}}>
+    <div style={{ position: "absolute", bottom: "50px", right: "10px", zIndex: 1000, display: "flex", alignItems: "center", gap: '5px' }}>
       <IconButton
-        sx={{ backgroundColor: "white",  "&:hover": { backgroundColor: "#f0f0f0" } }}
+        sx={{ backgroundColor: "white", "&:hover": { backgroundColor: "#f0f0f0" } }}
         onClick={zoomIn}
       >
         <AddIcon />
@@ -76,7 +79,7 @@ const MapComponent = () => {
   const [gridCorners, setGridCorners] = useState([]);
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false); 
+  const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
   const [satellitePath, setSatellitePath] = useState([
     [34.0522, -118.2437],
@@ -97,15 +100,31 @@ const MapComponent = () => {
     [51.5074, -0.1278],
     [48.8566, 2.3522],
   ]);
+  const [tileUrl, setTileUrl] = useState("");
+  useEffect(() => {
+    // Buscar a URL dos tiles do Google Earth Engine
 
+  }, []);
   useEffect(() => {
     const fetchGeoJson = async () => {
       const response = await fetch(
         "https://raw.githubusercontent.com/datasets/geo-boundaries-world-110m/master/countries.geojson"
       );
       const data = await response.json();
+
       setGeoJsonData(data);
     };
+    const fetchTileUrl = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/gee-data-coords?lat_min=-26.175159&lon_min=-55.843506&lat_max=-24.617057&lon_max=-53.360596");
+        setTileUrl(response.data.tile_url);
+        console.log(tileUrl)
+      } catch (error) {
+        console.error("Erro ao buscar a URL dos tiles:", error);
+      }
+    };
+
+    fetchTileUrl();
     fetchGeoJson();
   }, []);
 
@@ -220,12 +239,22 @@ const MapComponent = () => {
 
       {/* Main Map */}
       <MapContainer center={[51.505, -0.09]} zoom={2} style={{ height: "100vh", width: "100%" }}>
-        <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>' />
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        />
+        {tileUrl && (
+          <TileLayer
+            url={tileUrl}
+            attribution="Map data &copy; Google Earth Engine"
+            // opacity={0.5}
+          />
+        )}
         <LocationMarker position={markerPosition} />
         {gridCorners.map((cornerSet, index) => (
           <Rectangle key={index} bounds={[cornerSet.topLeft, cornerSet.bottomRight]} pathOptions={{ color: "blue", weight: 1, fillOpacity: 0.3 }} />
         ))}
-        <Polyline positions={satellitePath} color="red" weight={1} />
+        {/* <Polyline positions={satellitePath} c olor="red" weight={1} /> */}
         {/* Custom Zoom Controls */}
         <CustomControls />
       </MapContainer>
