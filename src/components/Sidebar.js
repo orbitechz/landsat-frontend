@@ -18,6 +18,10 @@ import {
   BarChartOutlined,
   Menu,
   ChevronLeft,
+  MapOutlined,
+  Bookmark,
+  AccountCircleRounded,
+  Settings,
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
@@ -96,7 +100,7 @@ const Sidebar = () => {
         <List sx={{ paddingTop: 0 }}>
           <ListItem button sx={menuItemStyle} onClick={() => navigate("/map")}>
             <ListItemIcon sx={{ color: "#90caf9" }}>
-              <PublicOutlined />
+              <MapOutlined />
             </ListItemIcon>
             <ListItemText primary="Map View" sx={{ opacity: open ? 1 : 0 }} />
           </ListItem>
@@ -104,13 +108,41 @@ const Sidebar = () => {
           <ListItem
             button
             sx={menuItemStyle}
-            onClick={() => navigate("/data-analysis")}
+            onClick={() => navigate("/favorites")}
           >
             <ListItemIcon sx={{ color: "#90caf9" }}>
-              <BarChartOutlined />
+              <Bookmark />
             </ListItemIcon>
             <ListItemText
-              primary="Data Analysis"
+              primary="Favorites"
+              sx={{ opacity: open ? 1 : 0 }}
+            />
+          </ListItem>
+
+          <ListItem
+            button
+            sx={menuItemStyle}
+            onClick={() => navigate("/account")}
+          >
+            <ListItemIcon sx={{ color: "#90caf9" }}>
+              <AccountCircleRounded />
+            </ListItemIcon>
+            <ListItemText
+              primary="Account"
+              sx={{ opacity: open ? 1 : 0 }}
+            />
+          </ListItem>
+
+          <ListItem
+            button
+            sx={menuItemStyle}
+            onClick={() => navigate("/settings")}
+          >
+            <ListItemIcon sx={{ color: "#90caf9" }}>
+              <Settings />
+            </ListItemIcon>
+            <ListItemText
+              primary="Settings"
               sx={{ opacity: open ? 1 : 0 }}
             />
           </ListItem>

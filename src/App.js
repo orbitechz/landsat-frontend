@@ -18,7 +18,7 @@ function App() {
           <Routes>
             <Route path="/" element={<MainContent />} />
             <Route path="/map" element={<MapComponent />} />  
-            <Route path="/config" element={<Configuration />} />
+            {/* <Route path="/config" element={<Configuration />} /> */}
             {/* <Route path="/data-analysis" element={<DataAnalysis />} />   */}
           </Routes>
         </Box>
