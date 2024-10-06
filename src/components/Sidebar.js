@@ -11,6 +11,7 @@ import {
   Typography,
   useMediaQuery,
   Box,
+  Tooltip,
 } from "@mui/material";
 import logo from "../assets/logo.png";
 import {
@@ -39,9 +40,9 @@ const Sidebar = () => {
 
   const StyledDrawer = styled(Drawer)(({ theme }) => ({
     ".MuiDrawer-paper": {
-      background: "linear-gradient(145deg, #0d47a1, #002171)",
+      background: "linear-gradient(145deg, #1e3c72, #2a5298)",
       color: "#ffffff",
-      borderRight: "1px solid #3d5afe",
+      borderRight: "1px solid rgba(255, 255, 255, 0.12)",
       width: open ? drawerWidth : theme.spacing(8),
       transition: theme.transitions.create("width", {
         easing: theme.transitions.easing.sharp,
@@ -49,6 +50,7 @@ const Sidebar = () => {
       }),
       overflowX: "hidden",
       boxSizing: "border-box",
+      boxShadow: "5px 0 15px rgba(0,0,0,0.2)",
       [theme.breakpoints.down("sm")]: {
         width: open ? "70%" : theme.spacing(7),
       },
@@ -80,14 +82,19 @@ const Sidebar = () => {
             justifyContent: open ? "space-between" : "center",
             padding: "8px 16px",
             color: "#ffffff",
-            background: "#1c54b2",
+            background: "#2a5298",
           }}
         >
           {open && (
             <img
               src={logo}
               alt="NASA"
-              style={{ width: "80%", height: "auto" }}
+              style={{
+                width: "70%",
+                height: "auto",
+                transition: "transform 0.3s",
+                transform: open ? "scale(1)" : "scale(0.8)",
+              }}
             />
           )}
 
@@ -98,54 +105,14 @@ const Sidebar = () => {
         <Divider />
 
         <List sx={{ paddingTop: 0 }}>
-          <ListItem button sx={menuItemStyle} onClick={() => navigate("/map")}>
-            <ListItemIcon sx={{ color: "#90caf9" }}>
-              <MapOutlined />
-            </ListItemIcon>
-            <ListItemText primary="Map View" sx={{ opacity: open ? 1 : 0 }} />
-          </ListItem>
-
-          <ListItem
-            button
-            sx={menuItemStyle}
-            onClick={() => navigate("/favorites")}
-          >
-            <ListItemIcon sx={{ color: "#90caf9" }}>
-              <Bookmark />
-            </ListItemIcon>
-            <ListItemText
-              primary="Favorites"
-              sx={{ opacity: open ? 1 : 0 }}
-            />
-          </ListItem>
-
-          <ListItem
-            button
-            sx={menuItemStyle}
-            onClick={() => navigate("/account")}
-          >
-            <ListItemIcon sx={{ color: "#90caf9" }}>
-              <AccountCircleRounded />
-            </ListItemIcon>
-            <ListItemText
-              primary="Account"
-              sx={{ opacity: open ? 1 : 0 }}
-            />
-          </ListItem>
-
-          <ListItem
-            button
-            sx={menuItemStyle}
-            onClick={() => navigate("/settings")}
-          >
-            <ListItemIcon sx={{ color: "#90caf9" }}>
-              <Settings />
-            </ListItemIcon>
-            <ListItemText
-              primary="Settings"
-              sx={{ opacity: open ? 1 : 0 }}
-            />
-          </ListItem>
+          {menuItems.map(({ text, icon, path }) => (
+            <Tooltip key={text} title={open ? "" : text} placement="right">
+              <ListItem button sx={menuItemStyle} onClick={() => navigate(path)}>
+                <ListItemIcon sx={{ color: "#bbdefb" }}>{icon}</ListItemIcon>
+                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+              </ListItem>
+            </Tooltip>
+          ))}
         </List>
 
         <Box
@@ -154,12 +121,11 @@ const Sidebar = () => {
             bottom: 20,
             width: "100%",
             textAlign: "center",
+            transition: "opacity 0.3s",
+            opacity: open ? 1 : 0,
           }}
         >
-          <Typography
-            variant="caption"
-            sx={{ color: "#90caf9", opacity: open ? 1 : 0 }}
-          >
+          <Typography variant="caption" sx={{ color: "#90caf9" }}>
             🚀 Explore the Cosmos!
           </Typography>
         </Box>
@@ -168,15 +134,23 @@ const Sidebar = () => {
   );
 };
 
+const menuItems = [
+  { text: "Map View", icon: <MapOutlined />, path: "/map" },
+  { text: "Favorites", icon: <Bookmark />, path: "/favorites" },
+  { text: "Account", icon: <AccountCircleRounded />, path: "/account" },
+  { text: "Settings", icon: <Settings />, path: "/settings" },
+];
+
 const menuItemStyle = {
-  padding: "10px 20px",
+  padding: "10px 24px",
   "&:hover": {
-    backgroundColor: "#3949ab",
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
   },
   "& .MuiListItemText-root": {
     fontWeight: 500,
-    fontSize: "0.95rem",
+    fontSize: "1rem",
   },
+  transition: "padding 0.2s",
 };
 
 export default Sidebar;

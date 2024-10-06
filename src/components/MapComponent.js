@@ -11,14 +11,17 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { Box, Button } from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsIcon from "@mui/icons-material/Notifications";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import axios from "axios";
 import SearchDrawer from "./SearchDrawer";
-import NotificationDrawer from "./NotificationDrawer"; // Import NotificationDrawer
+import NotificationDrawer from "./NotificationDrawer";
 import "./style/map.css";
 
+// Custom Icon Configuration
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -29,6 +32,7 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
 
+// Location Marker Component
 const LocationMarker = ({ position }) => {
   const map = useMap();
   if (position) {
@@ -41,14 +45,38 @@ const LocationMarker = ({ position }) => {
   ) : null;
 };
 
+// Custom Zoom Control Component
+const CustomControls = () => {
+  const map = useMap();
+  const zoomIn = () => map.zoomIn();
+  const zoomOut = () => map.zoomOut();
+
+  return (
+    <div style={{ position: "absolute", bottom: "50px", right: "10px", zIndex: 1000, display: "flex", alignItems: "center", gap: '5px'}}>
+      <IconButton
+        sx={{ backgroundColor: "white",  "&:hover": { backgroundColor: "#f0f0f0" } }}
+        onClick={zoomIn}
+      >
+        <AddIcon />
+      </IconButton>
+      <IconButton
+        sx={{ backgroundColor: "white", "&:hover": { backgroundColor: "#f0f0f0" } }}
+        onClick={zoomOut}
+      >
+        <RemoveIcon />
+      </IconButton>
+    </div>
+  );
+};
+
+// Main Map Component
 const MapComponent = () => {
   const [markerPosition, setMarkerPosition] = useState(null);
   const [loading, setLoading] = useState(false);
   const [gridCorners, setGridCorners] = useState([]);
-  const [countryPopup, setCountryPopup] = useState(null);
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false); // State for NotificationDrawer
+  const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false); 
   const [searchHistory, setSearchHistory] = useState([]);
   const [satellitePath, setSatellitePath] = useState([
     [34.0522, -118.2437],
@@ -135,6 +163,7 @@ const MapComponent = () => {
 
   return (
     <div>
+      {/* Toolbar for Search and Notification Buttons */}
       <Box
         sx={{
           display: "flex",
@@ -185,37 +214,20 @@ const MapComponent = () => {
         </Button>
       </Box>
 
-      {/* Search Drawer */}
-      <SearchDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        onSearch={handleSearch}
-      />
+      {/* Drawers for Search and Notifications */}
+      <SearchDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSearch={handleSearch} />
+      <NotificationDrawer open={notificationDrawerOpen} onClose={() => setNotificationDrawerOpen(false)} />
 
-      {/* Notification Drawer */}
-      <NotificationDrawer
-        open={notificationDrawerOpen}
-        onClose={() => setNotificationDrawerOpen(false)}
-      />
-
-      <MapContainer
-        center={[51.505, -0.09]}
-        zoom={2}
-        style={{ height: "100vh", width: "100%" }}
-      >
-        <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        />
+      {/* Main Map */}
+      <MapContainer center={[51.505, -0.09]} zoom={2} style={{ height: "100vh", width: "100%" }}>
+        <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>' />
         <LocationMarker position={markerPosition} />
         {gridCorners.map((cornerSet, index) => (
-          <Rectangle
-            key={index}
-            bounds={[cornerSet.topLeft, cornerSet.bottomRight]}
-            pathOptions={{ color: "blue", weight: 1, fillOpacity: 0.3 }}
-          />
+          <Rectangle key={index} bounds={[cornerSet.topLeft, cornerSet.bottomRight]} pathOptions={{ color: "blue", weight: 1, fillOpacity: 0.3 }} />
         ))}
         <Polyline positions={satellitePath} color="red" weight={1} />
+        {/* Custom Zoom Controls */}
+        <CustomControls />
       </MapContainer>
     </div>
   );
