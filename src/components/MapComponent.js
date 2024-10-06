@@ -6,7 +6,6 @@ import {
   Popup,
   Rectangle,
   GeoJSON,
-  Polyline,
   LayersControl,
   useMap,
 } from "react-leaflet";
@@ -33,6 +32,27 @@ L.Icon.Default.mergeOptions({
   shadowUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
+
+// Função para calcular os extremos lat/lon do grid
+const calculateBounds = (gridCorners) => {
+  let latMin = Infinity,
+    lonMin = Infinity,
+    latMax = -Infinity,
+    lonMax = -Infinity;
+
+  gridCorners.forEach((cornerSet) => {
+    const { topLeft, bottomRight } = cornerSet;
+    const [lat1, lon1] = topLeft;
+    const [lat2, lon2] = bottomRight;
+
+    latMin = Math.min(latMin, lat1, lat2);
+    lonMin = Math.min(lonMin, lon1, lon2);
+    latMax = Math.max(latMax, lat1, lat2);
+    lonMax = Math.max(lonMax, lon1, lon2);
+  });
+
+  return { latMin, lonMin, latMax, lonMax };
+};
 
 // Location Marker Component
 const LocationMarker = ({ position }) => {
@@ -135,10 +155,14 @@ const MapComponent = () => {
     };
 
     const fetchTileUrl = async () => {
+      if (gridCorners.length === 0) return; // Garantir que os cantos estejam presentes
+
+      // Calcular lat_min, lon_min, lat_max, lon_max com base nos gridCorners
+      const { latMin, lonMin, latMax, lonMax } = calculateBounds(gridCorners);
+
       try {
-        // Faz chamada para a API com o filtro selecionado
         const response = await axios.get(
-          `http://localhost:8000/gee-data-coords?filter=${filter}&lat_min=-26.175159&lon_min=-55.843506&lat_max=-24.617057&lon_max=-53.360596`
+          `http://localhost:8000/gee-data-coords?filter=${filter}&lat_min=${latMin}&lon_min=${lonMin}&lat_max=${latMax}&lon_max=${lonMax}`
         );
         setTileUrl(response.data.tile_url);
         console.log(response.data.tile_url);
@@ -149,7 +173,7 @@ const MapComponent = () => {
 
     fetchTileUrl();
     fetchGeoJson();
-  }, [filter]); // Dependência no filtro
+  }, [filter, gridCorners]); // Reexecutar o efeito quando o filtro ou gridCorners mudarem
 
   const handleSearch = async (country) => {
     if (!country.trim()) {
@@ -210,7 +234,7 @@ const MapComponent = () => {
         sx={{
           display: "flex",
           justifyContent: "flex-end",
-          alignItems: "center", // Alinhar verticalmente
+          alignItems: "center",
           mt: 2,
           mr: 2,
           position: "absolute",
