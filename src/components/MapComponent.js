@@ -20,6 +20,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import axios from "axios";
 import SearchDrawer from "./SearchDrawer";
 import NotificationDrawer from "./NotificationDrawer";
+import MapFilter from "./MapFilter"; // Adicionando o MapFilter
 import "./style/map.css";
 
 // Custom Icon Configuration
@@ -55,15 +56,31 @@ const CustomControls = () => {
   const zoomOut = () => map.zoomOut();
 
   return (
-    <div style={{ position: "absolute", bottom: "50px", right: "10px", zIndex: 1000, display: "flex", alignItems: "center", gap: '5px' }}>
+    <div
+      style={{
+        position: "absolute",
+        bottom: "50px",
+        right: "10px",
+        zIndex: 1000,
+        display: "flex",
+        alignItems: "center",
+        gap: "5px",
+      }}
+    >
       <IconButton
-        sx={{ backgroundColor: "white", "&:hover": { backgroundColor: "#f0f0f0" } }}
+        sx={{
+          backgroundColor: "white",
+          "&:hover": { backgroundColor: "#f0f0f0" },
+        }}
         onClick={zoomIn}
       >
         <AddIcon />
       </IconButton>
       <IconButton
-        sx={{ backgroundColor: "white", "&:hover": { backgroundColor: "#f0f0f0" } }}
+        sx={{
+          backgroundColor: "white",
+          "&:hover": { backgroundColor: "#f0f0f0" },
+        }}
         onClick={zoomOut}
       >
         <RemoveIcon />
@@ -182,11 +199,12 @@ const MapComponent = () => {
 
   return (
     <div>
-      {/* Toolbar for Search and Notification Buttons */}
+      {/* Toolbar for Search, Notifications and MapFilter */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "flex-end",
+          alignItems: "center", // Alinhar verticalmente
           mt: 2,
           mr: 2,
           position: "absolute",
@@ -198,6 +216,11 @@ const MapComponent = () => {
           boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
         }}
       >
+        {/* Map Filter */}
+        <Box sx={{ width: "200px", marginLeft: "3%", marginRight: "3%"}}>
+          <MapFilter />
+        </Box>
+
         <Button
           variant="contained"
           onClick={() => setDrawerOpen(true)}
@@ -227,6 +250,7 @@ const MapComponent = () => {
               backgroundColor: "#9a0007",
             },
             boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+            marginRight: "10px",
           }}
         >
           <NotificationsIcon />
@@ -234,11 +258,22 @@ const MapComponent = () => {
       </Box>
 
       {/* Drawers for Search and Notifications */}
-      <SearchDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} onSearch={handleSearch} />
-      <NotificationDrawer open={notificationDrawerOpen} onClose={() => setNotificationDrawerOpen(false)} />
+      <SearchDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onSearch={handleSearch}
+      />
+      <NotificationDrawer
+        open={notificationDrawerOpen}
+        onClose={() => setNotificationDrawerOpen(false)}
+      />
 
       {/* Main Map */}
-      <MapContainer center={[51.505, -0.09]} zoom={2} style={{ height: "100vh", width: "100%" }}>
+      <MapContainer
+        center={[51.505, -0.09]}
+        zoom={2}
+        style={{ height: "100vh", width: "100%" }}
+      >
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
@@ -252,7 +287,11 @@ const MapComponent = () => {
         )}
         <LocationMarker position={markerPosition} />
         {gridCorners.map((cornerSet, index) => (
-          <Rectangle key={index} bounds={[cornerSet.topLeft, cornerSet.bottomRight]} pathOptions={{ color: "blue", weight: 1, fillOpacity: 0.3 }} />
+          <Rectangle
+            key={index}
+            bounds={[cornerSet.topLeft, cornerSet.bottomRight]}
+            pathOptions={{ color: "blue", weight: 1, fillOpacity: 0.3 }}
+          />
         ))}
         {/* <Polyline positions={satellitePath} c olor="red" weight={1} /> */}
         {/* Custom Zoom Controls */}

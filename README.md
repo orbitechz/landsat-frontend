@@ -1,70 +1,127 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Landsat-Frontend
 
-## Available Scripts
+Welcome to the **Landsat-Frontend** repository! This is the front-end implementation for the Landsat Notification and Visualization System, which aims to provide users with an interactive and educational experience with satellite data. The frontend is built using React and various supporting libraries, including `react-leaflet` for geographic visualization. It connects users to real-time Landsat satellite overpass data, empowering them to monitor and analyze remote sensing imagery over their areas of interest.
 
-In the project directory, you can run:
+## 📚 Table of Contents
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Running the Application](#running-the-application)
+- [How It Works](#how-it-works)
+  - [Target Location Input](#target-location-input)
+  - [Satellite Overpass Tracking](#satellite-overpass-tracking)
+  - [Notification System](#notification-system)
+  - [Visualization and Analysis](#visualization-and-analysis)
+- [Technologies Used](#technologies-used)
+- [Project Goals](#project-goals)
+- [License](#license)
+- [Contact Information](#contact-information)
 
-### `npm start`
+## 🌍 Project Overview
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The **Landsat-Frontend** is an interactive web application that allows users to define a specific target location on Earth and receive notifications when a Landsat satellite will pass over that area. After the satellite has passed, users can view the corresponding Landsat Surface Reflectance (SR) data, enabling them to compare it with their own ground-based spectral measurements. The web-based interface provides visualization tools for analyzing and interpreting the data, supporting both scientific exploration and practical learning.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 🎯 What Exactly Does It Do?
+- Allows users to specify a geographic location and time of interest.
+- Tracks upcoming Landsat satellite overpasses for the selected location.
+- Sends real-time notifications when a satellite pass is imminent.
+- Retrieves and displays Landsat Surface Reflectance data for the specified region and time.
+- Supports comparison between satellite and ground-based spectral data.
+- Provides interactive tools for visualizing and analyzing environmental data.
 
-### `npm test`
+### 🛠️ How Does It Work?
+1. **Target Location Input**: Users define their target location through the web interface using an interactive map.
+2. **Satellite Overpass Tracking**: The system leverages publicly available satellite orbit data to predict when a Landsat satellite will pass over the selected area.
+3. **Notification System**: When a pass is imminent, the application sends alerts to the user, ensuring they don't miss the overpass.
+4. **Data Visualization**: Once the satellite has passed, the application retrieves the corresponding Landsat Surface Reflectance data. This data is then displayed alongside the user’s own ground-based measurements, providing a comparative view.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 💡 Benefits
+- **Experiential Learning**: Users can explore real satellite data, enhancing their understanding of remote sensing concepts.
+- **Interdisciplinary Approach**: Combines elements of geography, environmental science, and data analysis.
+- **Scientific Exploration**: Facilitates research and monitoring of environmental changes.
+- **Informed Decision-Making**: Supports data-driven insights into environmental issues.
 
-### `npm run build`
+## ✨ Features
+- **Interactive Map Interface** using React-Leaflet for precise location selection.
+- **Real-Time Notifications** for satellite overpasses.
+- **Satellite Data Integration** for displaying Landsat Surface Reflectance imagery.
+- **Comparison Tools** for analyzing ground-based and satellite spectral measurements.
+- **Data Visualization** using charts and spectral signatures.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🚀 Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Follow the instructions below to set up and run the project on your local machine.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Prerequisites
+- Node.js (v14 or later)
+- npm or yarn
+- Basic understanding of React and JavaScript
 
-### `npm run eject`
+### Installation
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/orbitechz/landsat-frontend.git
+   cd landsat-frontend
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+   Or, if you prefer `yarn`:
+   ```bash
+   yarn install
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Running the Application
+1. Start the development server:
+   ```bash
+   npm start
+   ```
+   Or with `yarn`:
+   ```bash
+   yarn start
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+2. Open your browser and navigate to `http://localhost:3000` to view the application.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🧠 How It Works
 
-## Learn More
+### Target Location Input
+Users can define a specific location using an interactive map interface provided by `react-leaflet`. Simply select the desired area on the map, and the coordinates will be saved as the target location for monitoring.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Satellite Overpass Tracking
+Using external APIs and satellite orbit data, the application calculates when a Landsat satellite will pass over the target location. This prediction is based on orbit models and timing parameters, ensuring accurate overpass tracking.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Notification System
+The application provides real-time notifications through the web interface, alerting users when an overpass is approaching. This feature ensures that users have ample time to prepare for data collection.
 
-### Code Splitting
+### Visualization and Analysis
+After the satellite has passed, the system retrieves the corresponding Landsat Surface Reflectance (SR) data for the specified location and time. Users can then view the data using intuitive visualization tools, such as:
+- **Color-Composite Images**: View the satellite image in true or false color.
+- **Spectral Signature Graphs**: Compare spectral signatures from satellite and ground-based measurements.
+- **Statistical Analysis**: Calculate NDVI (Normalized Difference Vegetation Index) and other indices.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 💻 Technologies Used
+The frontend is built using modern web development frameworks and libraries:
+- **React** - for building the user interface.
+- **React-Leaflet** - for mapping and geographic visualization.
+- **Axios** - for making API requests.
+- **Recharts** - for data visualization and graphing.
+- **CSS Modules** - for styling components.
 
-### Analyzing the Bundle Size
+## 🎯 Project Goals
+- **Accessibility**: Make satellite data accessible and understandable to a wider audience.
+- **Educational Support**: Create a learning platform that supports environmental science education.
+- **Scientific Contribution**: Encourage users to engage in environmental research and contribute to monitoring efforts.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 📜 License
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more details.
 
-### Making a Progressive Web App
+## 📧 Contact Information
+For questions, suggestions, or feedback, please reach out to:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **GitHub**: [orbitechz](https://github.com/orbitechz)
