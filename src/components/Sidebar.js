@@ -12,7 +12,7 @@ import {
   useMediaQuery,
   Box,
 } from "@mui/material";
-import logo from "../assets/logo.png"; // Adjust the path based on your actual structure
+import logo from "../assets/logo.png";
 import {
   PublicOutlined,
   BarChartOutlined,

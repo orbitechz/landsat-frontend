@@ -6,6 +6,7 @@ import {
   Popup,
   Rectangle,
   GeoJSON,
+  Polyline, // Import Polyline
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -46,6 +47,27 @@ const MapComponent = () => {
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
+
+  // Satellite path data (replace with your actual data)
+  const [satellitePath, setSatellitePath] = useState([
+    [34.0522, -118.2437], // Los Angeles
+    [37.7749, -122.4194], // San Francisco
+    [40.7128, -74.0060],  // New York
+    [42.3601, -71.0589],  // Boston
+    [41.8781, -87.6298],  // Chicago
+    [30.2672, -97.7431],  // Austin
+    [29.7604, -95.3698],  // Houston
+    [25.7617, -80.1918],  // Miami
+    [18.5204, 73.8567],   // Mumbai
+    [55.7558, 37.6173],   // Moscow
+    [39.9042, 116.4074],  // Beijing
+    [35.6895, 139.6917],  // Tokyo
+    [1.3521, 103.8198],   // Singapore
+    [-33.4489, -70.6693], // Santiago
+    [-34.6037, -58.3816], // Buenos Aires
+    [51.5074, -0.1278],   // London
+    [48.8566, 2.3522],    
+  ]);
 
   useEffect(() => {
     const fetchGeoJson = async () => {
@@ -231,6 +253,9 @@ const MapComponent = () => {
             </div>
           </Popup>
         )}
+
+        {/* Add Polyline for satellite path */}
+        <Polyline positions={satellitePath} color="red" weight={1} />
       </MapContainer>
     </div>
   );
@@ -252,8 +277,7 @@ const MapSnippet = ({ bounds }) => {
       />
       <Marker position={center}>
         <Popup>
-          Center of {bounds.getNorthEast().lat.toFixed(2)},{" "}
-          {bounds.getNorthEast().lng.toFixed(2)}
+          Center of {bounds.getSouthWest()} - {bounds.getNorthEast()}
         </Popup>
       </Marker>
     </MapContainer>
