@@ -20,7 +20,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import axios from "axios";
 import SearchDrawer from "./SearchDrawer";
 import NotificationDrawer from "./NotificationDrawer";
-import MapFilter from "./MapFilter"; // Adicionando o MapFilter
+import MapFilter from "./MapFilter"; // Importando o MapFilter
 import "./style/map.css";
 
 // Custom Icon Configuration
@@ -33,7 +33,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl:
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
 });
-
 
 // Location Marker Component
 const LocationMarker = ({ position }) => {
@@ -48,7 +47,8 @@ const LocationMarker = ({ position }) => {
   ) : null;
 };
 
-const { BaseLayer } = LayersControl
+const { BaseLayer } = LayersControl;
+
 // Custom Zoom Control Component
 const CustomControls = () => {
   const map = useMap();
@@ -98,7 +98,7 @@ const MapComponent = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
-  const [satellitePath, setSatellitePath] = useState([
+  const [satellitePath] = useState([
     [34.0522, -118.2437],
     [37.7749, -122.4194],
     [40.7128, -74.0060],
@@ -118,24 +118,30 @@ const MapComponent = () => {
     [48.8566, 2.3522],
   ]);
   const [tileUrl, setTileUrl] = useState("");
-  useEffect(() => {
-    // Buscar a URL dos tiles do Google Earth Engine
+  const [filter, setFilter] = useState("truecolor"); // Estado para o filtro
 
-  }, []);
+  // Função de callback passada para MapFilter para mudar o filtro
+  const handleFilterChange = (newFilter) => {
+    setFilter(newFilter);
+  };
+
   useEffect(() => {
     const fetchGeoJson = async () => {
       const response = await fetch(
         "https://raw.githubusercontent.com/datasets/geo-boundaries-world-110m/master/countries.geojson"
       );
       const data = await response.json();
-
       setGeoJsonData(data);
     };
+
     const fetchTileUrl = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/gee-data-coords?lat_min=-26.175159&lon_min=-55.843506&lat_max=-24.617057&lon_max=-53.360596");
+        // Faz chamada para a API com o filtro selecionado
+        const response = await axios.get(
+          `http://localhost:8000/gee-data-coords?filter=${filter}&lat_min=-26.175159&lon_min=-55.843506&lat_max=-24.617057&lon_max=-53.360596`
+        );
         setTileUrl(response.data.tile_url);
-        console.log(tileUrl)
+        console.log(response.data.tile_url);
       } catch (error) {
         console.error("Erro ao buscar a URL dos tiles:", error);
       }
@@ -143,7 +149,7 @@ const MapComponent = () => {
 
     fetchTileUrl();
     fetchGeoJson();
-  }, []);
+  }, [filter]); // Dependência no filtro
 
   const handleSearch = async (country) => {
     if (!country.trim()) {
@@ -217,8 +223,8 @@ const MapComponent = () => {
         }}
       >
         {/* Map Filter */}
-        <Box sx={{ width: "200px", marginLeft: "3%", marginRight: "3%"}}>
-          <MapFilter />
+        <Box sx={{ width: "200px", marginLeft: "3%", marginRight: "3%" }}>
+          <MapFilter onFilterChange={handleFilterChange} />
         </Box>
 
         <Button
@@ -282,7 +288,6 @@ const MapComponent = () => {
           <TileLayer
             url={tileUrl}
             attribution="Map data &copy; Google Earth Engine"
-            // opacity={0.5}
           />
         )}
         <LocationMarker position={markerPosition} />
@@ -293,7 +298,6 @@ const MapComponent = () => {
             pathOptions={{ color: "blue", weight: 1, fillOpacity: 0.3 }}
           />
         ))}
-        {/* <Polyline positions={satellitePath} c olor="red" weight={1} /> */}
         {/* Custom Zoom Controls */}
         <CustomControls />
       </MapContainer>

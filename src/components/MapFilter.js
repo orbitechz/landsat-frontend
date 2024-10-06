@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { FormControl, MenuItem, Select, InputLabel } from '@mui/material';
 
-const MapFilter = () => {
+const MapFilter = ({ onFilterChange }) => {
   const [filter, setFilter] = useState('');
 
   const handleChange = (event) => {
-    setFilter(event.target.value);
+    const selectedFilter = event.target.value;
+    setFilter(selectedFilter);
+    onFilterChange(selectedFilter);  // Notifica o componente pai da mudança
   };
 
   return (
@@ -28,9 +30,9 @@ const MapFilter = () => {
           },
         }}
       >
-        <MenuItem value="green" sx={{ padding: "10px", '&:hover': { backgroundColor: '#e0e0e0' } }}>True Color</MenuItem>
-        <MenuItem value="infrared" sx={{ padding: "10px", '&:hover': { backgroundColor: '#e0e0e0' } }}>Thermal</MenuItem>
-        <MenuItem value="random" sx={{ padding: "10px", '&:hover': { backgroundColor: '#e0e0e0' } }}>NVDI</MenuItem>
+        <MenuItem value="truecolor" sx={{ padding: "10px", '&:hover': { backgroundColor: '#e0e0e0' } }}>True Color</MenuItem>
+        <MenuItem value="thermal" sx={{ padding: "10px", '&:hover': { backgroundColor: '#e0e0e0' } }}>Thermal</MenuItem>
+        <MenuItem value="infrared" sx={{ padding: "10px", '&:hover': { backgroundColor: '#e0e0e0' } }}>Infrared</MenuItem>
       </Select>
     </FormControl>
   );
