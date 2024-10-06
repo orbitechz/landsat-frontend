@@ -6,15 +6,17 @@ import {
   Popup,
   Rectangle,
   GeoJSON,
-  Polyline, // Import Polyline
+  Polyline,
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Box, Button } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import axios from "axios";
 import SearchDrawer from "./SearchDrawer";
+import NotificationDrawer from "./NotificationDrawer"; // Import NotificationDrawer
 import "./style/map.css";
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -46,27 +48,26 @@ const MapComponent = () => {
   const [countryPopup, setCountryPopup] = useState(null);
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [notificationDrawerOpen, setNotificationDrawerOpen] = useState(false); // State for NotificationDrawer
   const [searchHistory, setSearchHistory] = useState([]);
-
-  // Satellite path data (replace with your actual data)
   const [satellitePath, setSatellitePath] = useState([
-    [34.0522, -118.2437], // Los Angeles
-    [37.7749, -122.4194], // San Francisco
-    [40.7128, -74.0060],  // New York
-    [42.3601, -71.0589],  // Boston
-    [41.8781, -87.6298],  // Chicago
-    [30.2672, -97.7431],  // Austin
-    [29.7604, -95.3698],  // Houston
-    [25.7617, -80.1918],  // Miami
-    [18.5204, 73.8567],   // Mumbai
-    [55.7558, 37.6173],   // Moscow
-    [39.9042, 116.4074],  // Beijing
-    [35.6895, 139.6917],  // Tokyo
-    [1.3521, 103.8198],   // Singapore
-    [-33.4489, -70.6693], // Santiago
-    [-34.6037, -58.3816], // Buenos Aires
-    [51.5074, -0.1278],   // London
-    [48.8566, 2.3522],    
+    [34.0522, -118.2437],
+    [37.7749, -122.4194],
+    [40.7128, -74.0060],
+    [42.3601, -71.0589],
+    [41.8781, -87.6298],
+    [30.2672, -97.7431],
+    [29.7604, -95.3698],
+    [25.7617, -80.1918],
+    [18.5204, 73.8567],
+    [55.7558, 37.6173],
+    [39.9042, 116.4074],
+    [35.6895, 139.6917],
+    [1.3521, 103.8198],
+    [-33.4489, -70.6693],
+    [-34.6037, -58.3816],
+    [51.5074, -0.1278],
+    [48.8566, 2.3522],
   ]);
 
   useEffect(() => {
@@ -132,49 +133,6 @@ const MapComponent = () => {
     setLoading(false);
   };
 
-  const countryStyle = {
-    color: "transparent",
-    weight: 1,
-    fillColor: "transparent",
-    fillOpacity: 0.3,
-  };
-
-  const hoverStyle = {
-    fillColor: "#74baff",
-    fillOpacity: 0.7,
-  };
-
-  const onEachCountry = (country, layer) => {
-    layer.setStyle(countryStyle);
-
-    layer.on({
-      mouseover: (e) => {
-        const layer = e.target;
-        layer.setStyle(hoverStyle);
-        setCountryPopup({
-          name: layer.feature.properties.name,
-          latlng: e.latlng,
-          bounds: layer.getBounds(),
-        });
-      },
-      mouseout: (e) => {
-        const layer = e.target;
-        layer.setStyle(countryStyle);
-        setCountryPopup(null);
-      },
-    });
-  };
-
-  const sendDataToBackend = async () => {
-    if (searchHistory.length === 0) return;
-
-    try {
-      console.log(searchHistory);
-    } catch (error) {
-      console.error("Error sending data to backend:", error);
-    }
-  };
-
   return (
     <div>
       <Box
@@ -204,16 +162,40 @@ const MapComponent = () => {
               backgroundColor: "#155a9e",
             },
             boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+            marginRight: "10px",
           }}
         >
           <SearchIcon />
         </Button>
+        <Button
+          variant="contained"
+          onClick={() => setNotificationDrawerOpen(true)}
+          sx={{
+            borderRadius: "8px",
+            backgroundColor: "#d32f2f",
+            color: "#fff",
+            padding: "10px 16px",
+            "&:hover": {
+              backgroundColor: "#9a0007",
+            },
+            boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <NotificationsIcon />
+        </Button>
       </Box>
 
+      {/* Search Drawer */}
       <SearchDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         onSearch={handleSearch}
+      />
+
+      {/* Notification Drawer */}
+      <NotificationDrawer
+        open={notificationDrawerOpen}
+        onClose={() => setNotificationDrawerOpen(false)}
       />
 
       <MapContainer
@@ -233,54 +215,9 @@ const MapComponent = () => {
             pathOptions={{ color: "blue", weight: 1, fillOpacity: 0.3 }}
           />
         ))}
-        {geoJsonData && (
-          <GeoJSON data={geoJsonData} onEachFeature={onEachCountry} />
-        )}
-        {countryPopup && (
-          <Popup
-            position={countryPopup.latlng}
-            closeButton={false}
-            onClose={() => setCountryPopup(null)}
-            className="custom-popup"
-          >
-            <div style={{ width: "300px", height: "250px" }}>
-              <MapSnippet bounds={countryPopup.bounds} />
-              <div style={{ marginTop: "10px" }}>
-                <h3>{countryPopup.name}</h3>
-                <p>Next landsat: 4 days</p>
-                <p>Last landsat: 12 days </p>
-              </div>
-            </div>
-          </Popup>
-        )}
-
-        {/* Add Polyline for satellite path */}
         <Polyline positions={satellitePath} color="red" weight={1} />
       </MapContainer>
     </div>
-  );
-};
-
-const MapSnippet = ({ bounds }) => {
-  const center = bounds.getCenter();
-  return (
-    <MapContainer
-      center={center}
-      zoom={0}
-      noWrap={true}
-      style={{ height: "150px", width: "100%" }}
-    >
-      <TileLayer
-        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-        noWrap={true}
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-      />
-      <Marker position={center}>
-        <Popup>
-          Center of {bounds.getSouthWest()} - {bounds.getNorthEast()}
-        </Popup>
-      </Marker>
-    </MapContainer>
   );
 };
 
